@@ -2,8 +2,8 @@ name: Sync Upstream
 
 on:
   schedule:
-    - cron: '0 */6 * * *'  # 每6小时自动执行一次
-  workflow_dispatch:       # 允许手动触发
+    - cron: '0 0 * * *'  # 星号分别表示：分钟(0) 小时(0) 日(*) 月(*) 星期(*) 
+  workflow_dispatch:
 
 jobs:
   sync:
@@ -14,9 +14,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Set Git config
+        run: |
+          git config user.name "jackloves"
+          git config user.email "${{ secrets.GIT_EMAIL }}"
+
       - name: Sync upstream
         run: |
-          git remote add upstream https://github.com/thsrite/MoviePilot-Plugins.git
+          git remote add upstream https://github.com/thsrite/MoviePilot-Plugins.git || true
           git fetch upstream
           git checkout main
           git merge upstream/main
