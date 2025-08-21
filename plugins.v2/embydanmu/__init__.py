@@ -20,7 +20,7 @@ class EmbyDanmu(_PluginBase):
     # 插件图标
     plugin_icon = "https://raw.githubusercontent.com/thsrite/MoviePilot-Plugins/main/icons/danmu.png"
     # 插件版本
-    plugin_version = "1.6"
+    plugin_version = "1.8"
     # 插件作者
     plugin_author = "thsrite"
     # 作者主页
@@ -34,6 +34,7 @@ class EmbyDanmu(_PluginBase):
 
     # 私有属性
     _enabled = False
+    _disabled = False
     _library_task = {}
     _danmu_source = []
     _mediaservers = None
@@ -52,6 +53,7 @@ class EmbyDanmu(_PluginBase):
         # 读取配置
         if config:
             self._enabled = config.get("enabled")
+            self._disabled = config.get("disabled")
             self._dirs = config.get("dirs")
             self._mediaservers = config.get("mediaservers") or []
 
@@ -425,7 +427,7 @@ class EmbyDanmu(_PluginBase):
 
                 # 判断当前媒体库是否有其他任务在执行
                 self._library_task[library_id].remove(library_item_name)
-                if len(self._library_task[library_id]) == 0:
+                if len(self._library_task[library_id]) == 0 and self._disabled:
                     # 关闭弹幕插件
                     logger.info(
                         f"{emby_name} {library_name} {library_item_name} {f'第{library_item_season}季 ' if library_item_season else ''}获取弹幕任务完成，关闭弹幕插件")
@@ -595,7 +597,9 @@ class EmbyDanmu(_PluginBase):
         else:
             retry_cnt = len(season_items)
             _downloaded_danmu_files = []
-            while len(_downloaded_danmu_files) < len(season_items) and retry_cnt > 0:
+            # 没有新增弹幕充实3次直接跳过
+            _no_incre_cnt = 0
+            while len(_downloaded_danmu_files) < len(season_items) and retry_cnt > 0 and _no_incre_cnt <= 3:
                 # 解析日志判断是否全部失败
                 if self.__check_all_failed_by_log(item_name=item_info.get("SeriesName"),
                                                   item_year=item_info.get("ProductionYear")):
@@ -607,6 +611,9 @@ class EmbyDanmu(_PluginBase):
                         if danmu_file.name not in _downloaded_danmu_files:
                             _downloaded_danmu_files.append(danmu_file.name)
                             logger.info(f"已下载弹幕文件：{danmu_file.name}")
+                            _no_incre_cnt = 0
+                        else:
+                            _no_incre_cnt += 1
                     # 判断是否完成任务
                     if len(_downloaded_danmu_files) != len(season_items):
                         retry_cnt -= 1
@@ -761,6 +768,22 @@ class EmbyDanmu(_PluginBase):
                                         }
                                     }
                                 ]
+                            },
+                            {
+                                'component': 'VCol',
+                                'props': {
+                                    'cols': 12,
+                                    'md': 6
+                                },
+                                'content': [
+                                    {
+                                        'component': 'VSwitch',
+                                        'props': {
+                                            'model': 'disabled',
+                                            'label': '是否禁用媒体库的Danmu插件',
+                                        }
+                                    }
+                                ]
                             }
                         ]
                     },
@@ -858,6 +881,7 @@ class EmbyDanmu(_PluginBase):
             }
         ], {
             "enabled": False,
+            "disabled": False,
             "dirs": "",
             "mediaservers": [],
         }
