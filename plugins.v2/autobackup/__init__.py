@@ -190,7 +190,7 @@ class AutoBackup(_PluginBase):
                 self.__clean_old_webdav_backups(self._webdav_max_count)
 
         # 发送通知
-        if self._notify or self._webdav_notify:
+        if self._notify or (self._webdav_enabled and self._webdav_notify):
             notification_msg = f"创建备份{'成功' if success else '失败'}\n"
             if success:
                 notification_msg += f"清理备份数量 {del_cnt}\n"
@@ -943,7 +943,7 @@ class AutoBackup(_PluginBase):
             "webhook_url": "",
             "back_path": str(self.get_data_path()),
             "webdav_enabled": False,
-            "webdav_notify": True
+            "webdav_notify": False
         }
 
     def get_page(self) -> List[dict]:
