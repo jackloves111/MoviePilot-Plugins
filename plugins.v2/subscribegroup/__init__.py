@@ -184,7 +184,7 @@ class SubscribeGroup(_PluginBase):
             # 二级分类自定义配置
             category_conf = self._subscribe_confs.get(category)
 
-            logger.error(
+            logger.info(
                 f"订阅记录:{subscribe.name} 二级分类:{category} 自定义配置:{category_conf}")
 
             update_dict = {}
