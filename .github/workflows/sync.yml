@@ -1,28 +1,28 @@
-name: Sync Upstream
+# name: Sync Upstream
 
-on:
-  schedule:
-    - cron: '0 0 * * *'  # 星号分别表示：分钟(0) 小时(0) 日(*) 月(*) 星期(*) 
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: '0 0 * * *'  # 星号分别表示：分钟(0) 小时(0) 日(*) 月(*) 星期(*) 
+#   workflow_dispatch:
 
-jobs:
-  sync:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+# jobs:
+#   sync:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 0
 
-      - name: Set Git config
-        run: |
-          git config user.name "jackloves"
-          git config user.email "${{ secrets.GIT_EMAIL }}"
+#       - name: Set Git config
+#         run: |
+#           git config user.name "jackloves"
+#           git config user.email "${{ secrets.GIT_EMAIL }}"
 
-      - name: Sync upstream
-        run: |
-          git remote add upstream https://github.com/thsrite/MoviePilot-Plugins.git || true
-          git fetch upstream
-          git checkout main
-          git merge upstream/main
-          git push origin main
+#       - name: Sync upstream
+#         run: |
+#           git remote add upstream https://github.com/thsrite/MoviePilot-Plugins.git || true
+#           git fetch upstream
+#           git checkout main
+#           git merge upstream/main
+#           git push origin main
